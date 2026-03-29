@@ -14,8 +14,22 @@ export class CoursesService {
     @InjectRepository(Lesson) private lessonsRepo: Repository<Lesson>,
   ) {}
 
-  async findAll(): Promise<Course[]> {
-    return this.coursesRepo.find({ order: { order: 'ASC' } });
+  async findAll(page: number = 1, limit: number = 10) {
+    const [data, total] = await this.coursesRepo.findAndCount({
+      order: { order: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string): Promise<Course> {
