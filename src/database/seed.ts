@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Lesson, LessonType } from '../lessons/lesson.entity';
 import { Quiz, QuestionType } from '../quiz/quiz.entity';
 import { User, UserRole, SubscriptionType } from '../users/user.entity';
+import { Course } from '../courses/course.entity';
 import * as bcrypt from 'bcrypt';
 
 async function seed() {
@@ -13,6 +14,7 @@ async function seed() {
   const lessonsRepo = app.get<Repository<Lesson>>(getRepositoryToken(Lesson));
   const quizRepo = app.get<Repository<Quiz>>(getRepositoryToken(Quiz));
   const usersRepo = app.get<Repository<User>>(getRepositoryToken(User));
+  const coursesRepo = app.get<Repository<Course>>(getRepositoryToken(Course));
 
   // -- Admin user --------------------------------------------------------------
   const existing = await usersRepo.findOne({
@@ -30,6 +32,44 @@ async function seed() {
     console.log('Admin user created: admin@learnpiano.com / Admin@123456');
   }
 
+  // -- Courses ----------------------------------------------------------------
+  const coursesData: Partial<Course>[] = [
+    {
+      title: 'Piano for Beginners',
+      description:
+        'Khóa học piano dành cho người mới bắt đầu hoàn toàn. ' +
+        'Học từ cơ bản nhất: phím đàn, nốt nhạc, tư thế ngồi, đọc bản nhạc và các gam cơ bản.',
+      thumbnail: null,
+      isPremium: false,
+      order: 1,
+    },
+    {
+      title: 'Advanced Piano Techniques',
+      description:
+        'Nâng cao kỹ năng với hợp âm, hòa âm, kỹ thuật biểu diễn nâng cao. ' +
+        'Dành cho học viên đã hoàn thành khóa Beginners.',
+      thumbnail: null,
+      isPremium: true,
+      order: 2,
+    },
+  ];
+
+  const savedCourses: Course[] = [];
+  for (const data of coursesData) {
+    const exists = await coursesRepo.findOne({ where: { title: data.title } });
+    if (!exists) {
+      const course = coursesRepo.create(data);
+      const saved = await coursesRepo.save(course);
+      savedCourses.push(saved);
+      console.log(`Course created: ${saved.title}`);
+    } else {
+      savedCourses.push(exists);
+    }
+  }
+
+  const beginnerCourse = savedCourses.find((c) => c.title === 'Piano for Beginners')!;
+  const advancedCourse = savedCourses.find((c) => c.title === 'Advanced Piano Techniques')!;
+
   // -- Lessons -----------------------------------------------------------------
   const lessonsData: Partial<Lesson>[] = [
     {
@@ -42,6 +82,7 @@ async function seed() {
       order: 1,
       isPremium: false,
       quizIds: [],
+      courseId: beginnerCourse.id,
     },
     {
       title: 'Reading Sheet Music Basics',
@@ -53,6 +94,7 @@ async function seed() {
       order: 2,
       isPremium: false,
       quizIds: [],
+      courseId: beginnerCourse.id,
     },
     {
       title: 'Major Scales',
@@ -64,28 +106,7 @@ async function seed() {
       order: 3,
       isPremium: false,
       quizIds: [],
-    },
-    {
-      title: 'Chords & Harmony',
-      content:
-        '## Introduction to Chords\nLearn major and minor triads, how to build them from any root note, ' +
-        'and basic chord progressions (I-IV-V-I).',
-      type: LessonType.QUIZ,
-      xpReward: 25,
-      order: 4,
-      isPremium: true,
-      quizIds: [],
-    },
-    {
-      title: 'Advanced Techniques',
-      content:
-        '## Advanced Piano Techniques\nLegato, staccato, dynamics (piano/forte), ' +
-        'pedaling techniques, and ornaments (trills, mordents).',
-      type: LessonType.THEORY,
-      xpReward: 30,
-      order: 5,
-      isPremium: true,
-      quizIds: [],
+      courseId: beginnerCourse.id,
     },
     {
       title: 'Piano Fundamentals Quiz',
@@ -94,9 +115,34 @@ async function seed() {
         'scales, chords, rhythm, and dynamics. Answer all 10 questions to earn XP!',
       type: LessonType.QUIZ,
       xpReward: 50,
-      order: 6,
+      order: 4,
       isPremium: false,
       quizIds: [],
+      courseId: beginnerCourse.id,
+    },
+    {
+      title: 'Chords & Harmony',
+      content:
+        '## Introduction to Chords\nLearn major and minor triads, how to build them from any root note, ' +
+        'and basic chord progressions (I-IV-V-I).',
+      type: LessonType.QUIZ,
+      xpReward: 25,
+      order: 1,
+      isPremium: true,
+      quizIds: [],
+      courseId: advancedCourse.id,
+    },
+    {
+      title: 'Advanced Techniques',
+      content:
+        '## Advanced Piano Techniques\nLegato, staccato, dynamics (piano/forte), ' +
+        'pedaling techniques, and ornaments (trills, mordents).',
+      type: LessonType.THEORY,
+      xpReward: 30,
+      order: 2,
+      isPremium: true,
+      quizIds: [],
+      courseId: advancedCourse.id,
     },
   ];
 

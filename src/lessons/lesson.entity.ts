@@ -37,10 +37,12 @@ export class Lesson {
   @Column({ default: false })
   isPremium: boolean;
 
+  @Column({ nullable: true, type: 'varchar' })
+  courseId: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

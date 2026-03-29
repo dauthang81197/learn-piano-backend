@@ -12,4 +12,3 @@ import { ProgressModule } from '../progress/progress.module';
   exports: [QuizService],
 })
 export class QuizModule {}
-

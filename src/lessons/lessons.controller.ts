@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { LessonsService } from './lessons.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -75,4 +66,3 @@ export class LessonsController {
     return this.lessonsService.remove(id);
   }
 }
-

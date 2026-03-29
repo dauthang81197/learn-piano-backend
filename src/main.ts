@@ -7,11 +7,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const configuredOrigins = (
-    process.env.FRONTEND_URLS ||
-    process.env.FRONTEND_URL ||
-    ''
-  )
+  const configuredOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
@@ -76,8 +72,6 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`🚀 Application running on: http://localhost:${port}/api/v1`);
-  console.log(
-    `📚 Swagger docs available at: http://localhost:${port}/api/docs`,
-  );
+  console.log(`📚 Swagger docs available at: http://localhost:${port}/api/docs`);
 }
 void bootstrap();

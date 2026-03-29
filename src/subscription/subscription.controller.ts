@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -31,10 +24,7 @@ export class SubscriptionController {
   @ApiOperation({ summary: 'Nâng cấp lên gói Premium' })
   @ApiResponse({ status: 201, description: 'Nâng cấp thành công' })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
-  upgrade(
-    @CurrentUser() user: User,
-    @Body() dto: UpgradeSubscriptionDto,
-  ) {
+  upgrade(@CurrentUser() user: User, @Body() dto: UpgradeSubscriptionDto) {
     return this.subscriptionService.upgradeSubscription(user, dto);
   }
 
@@ -48,4 +38,3 @@ export class SubscriptionController {
     return this.subscriptionService.cancelSubscription(user);
   }
 }
-

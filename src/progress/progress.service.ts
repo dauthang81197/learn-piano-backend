@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, SubscriptionType } from '../users/user.entity';
+import { User } from '../users/user.entity';
 
 const BADGES = {
   BEGINNER: 'Beginner',
@@ -13,9 +13,7 @@ const BADGES = {
 
 @Injectable()
 export class ProgressService {
-  constructor(
-    @InjectRepository(User) private usersRepo: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private usersRepo: Repository<User>) {}
 
   /** Award XP and update level, streak, badges, completedLessons */
   async addXp(user: User, xp: number, lessonId?: string): Promise<User> {
@@ -43,9 +41,7 @@ export class ProgressService {
       const last = new Date(user.lastActiveDate);
       last.setHours(0, 0, 0, 0);
 
-      const diffDays = Math.round(
-        (today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const diffDays = Math.round((today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
 
       if (diffDays === 1) {
         user.streak += 1;
@@ -80,7 +76,7 @@ export class ProgressService {
     user.badges = Array.from(badges);
   }
 
-  async getProgress(user: User) {
+  getProgress(user: User) {
     return {
       id: user.id,
       name: user.name,
@@ -120,4 +116,3 @@ export class ProgressService {
     return this.addXp(user, xpReward, lessonId);
   }
 }
-

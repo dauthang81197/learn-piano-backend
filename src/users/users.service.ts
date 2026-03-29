@@ -5,9 +5,7 @@ import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private usersRepo: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private usersRepo: Repository<User>) {}
 
   async findById(id: string): Promise<User> {
     const user = await this.usersRepo.findOne({ where: { id } });
@@ -23,4 +21,3 @@ export class UsersService {
     return this.usersRepo.save(user);
   }
 }
-
