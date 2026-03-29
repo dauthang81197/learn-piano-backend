@@ -1,0 +1,20 @@
+version: '3.8'
+
+# Database và Redis đã chạy sẵn bên ngoài (external).
+# File này chỉ dùng để chạy backend app trong container khi dev local.
+# Nếu muốn chạy trực tiếp bằng Node: npm run start:dev
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: learn_piano_backend_dev
+    restart: unless-stopped
+    ports:
+      - '${PORT:-8000}:8000'
+    env_file:
+      - .env
+    extra_hosts:
+      # Cho phép container truy cập DB/Redis đang chạy trên host machine
+      - 'host.docker.internal:host-gateway'
