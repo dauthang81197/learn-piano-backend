@@ -28,7 +28,7 @@ export class QuizService {
     // Hide answers before sending to client
     const sanitized = {
       ...quiz,
-      questions: quiz.questions.map(({ answer: _a, ...q }) => q),
+      questions: quiz.questions.map(({ answer: _answer, ...q }) => q),
     };
     return sanitized as Quiz;
   }
@@ -38,21 +38,14 @@ export class QuizService {
     return this.quizRepo.save(quiz);
   }
 
-  async submitQuiz(
-    lessonId: string,
-    dto: SubmitQuizDto,
-    user: User,
-  ): Promise<QuizResult> {
+  async submitQuiz(lessonId: string, dto: SubmitQuizDto, user: User): Promise<QuizResult> {
     const quiz = await this.quizRepo.findOne({ where: { lessonId } });
     if (!quiz) throw new NotFoundException('Quiz not found for this lesson');
 
     let correct = 0;
     const correctAnswers = quiz.questions.map((q) => {
       const submitted = dto.answers.find((a) => a.questionId === q.id);
-      const isCorrect = this.checkAnswer(
-        q.answer,
-        submitted?.answer,
-      );
+      const isCorrect = this.checkAnswer(q.answer, submitted?.answer);
       if (isCorrect) correct++;
       return { questionId: q.id, correct: isCorrect };
     });
@@ -81,10 +74,6 @@ export class QuizService {
         correct.every((c, i) => c.toLowerCase() === submitted[i]?.toLowerCase())
       );
     }
-    return (
-      String(correct).toLowerCase().trim() ===
-      String(submitted).toLowerCase().trim()
-    );
+    return String(correct).toLowerCase().trim() === String(submitted).toLowerCase().trim();
   }
 }
-

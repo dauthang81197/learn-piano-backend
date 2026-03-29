@@ -93,4 +93,3 @@ export class InitialSchema1711000000000 implements MigrationInterface {
     await queryRunner.query(`DROP TYPE "public"."users_role_enum"`);
   }
 }
-

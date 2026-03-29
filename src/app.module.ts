@@ -29,8 +29,8 @@ import { Quiz } from './quiz/quiz.entity';
         entities: [User, Lesson, Quiz],
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_history',
-        synchronize: false,      // ← tắt hoàn toàn, dùng migration thay thế
-        migrationsRun: true,     // ← tự chạy migration pending khi app khởi động
+        synchronize: false, // ← tắt hoàn toàn, dùng migration thay thế
+        migrationsRun: true, // ← tự chạy migration pending khi app khởi động
         logging: config.get<string>('NODE_ENV') === 'development',
       }),
     }),
