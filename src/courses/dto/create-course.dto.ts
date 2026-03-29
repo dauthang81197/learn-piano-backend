@@ -26,4 +26,3 @@ export class CreateCourseDto {
   @Min(0)
   order?: number;
 }
-

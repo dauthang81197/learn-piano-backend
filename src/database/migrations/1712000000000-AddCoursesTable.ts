@@ -33,4 +33,3 @@ export class AddCoursesTable1712000000000 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "courses"`);
   }
 }
-

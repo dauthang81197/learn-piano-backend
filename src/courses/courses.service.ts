@@ -57,8 +57,7 @@ export class CoursesService {
       lessons: roadmap,
       completedCount,
       totalCount: roadmap.length,
-      progressPercent:
-        roadmap.length > 0 ? Math.round((completedCount / roadmap.length) * 100) : 0,
+      progressPercent: roadmap.length > 0 ? Math.round((completedCount / roadmap.length) * 100) : 0,
     };
   }
 
