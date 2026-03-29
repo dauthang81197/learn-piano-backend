@@ -12,4 +12,3 @@ import { CoursesController } from './courses.controller';
   exports: [CoursesService],
 })
 export class CoursesModule {}
-
