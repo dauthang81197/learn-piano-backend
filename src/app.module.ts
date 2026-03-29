@@ -9,9 +9,11 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { QuizModule } from './quiz/quiz.module';
 import { ProgressModule } from './progress/progress.module';
+import { CoursesModule } from './courses/courses.module';
 import { User } from './users/user.entity';
 import { Lesson } from './lessons/lesson.entity';
 import { Quiz } from './quiz/quiz.entity';
+import { Course } from './courses/course.entity';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { Quiz } from './quiz/quiz.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_DATABASE', 'learn_piano'),
-        entities: [User, Lesson, Quiz],
+        entities: [User, Lesson, Quiz, Course],
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_history',
         synchronize: false, // ← tắt hoàn toàn, dùng migration thay thế
@@ -40,6 +42,7 @@ import { Quiz } from './quiz/quiz.entity';
     LessonsModule,
     QuizModule,
     ProgressModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
