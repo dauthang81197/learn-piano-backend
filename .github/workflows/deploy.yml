@@ -3,10 +3,10 @@ name: Deploy Backend to VPS
 on:
   push:
     branches:
-      - develop
+      - cicd/github
   pull_request:
     branches:
-      - develop
+      - cicd/github
   workflow_dispatch:
 
 env:
