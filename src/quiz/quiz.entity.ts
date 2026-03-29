@@ -40,4 +40,3 @@ export class Quiz {
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

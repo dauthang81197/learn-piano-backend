@@ -12,4 +12,3 @@ import { LessonsModule } from '../lessons/lessons.module';
   exports: [ProgressService],
 })
 export class ProgressModule {}
-

@@ -14,8 +14,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Trả về thông tin profile' })
   @ApiResponse({ status: 401, description: 'Chưa xác thực' })
   getProfile(@CurrentUser() user: User) {
-    const { passwordHash, ...profile } = user;
+    const { passwordHash: _passwordHash, ...profile } = user;
     return profile;
   }
 }
-

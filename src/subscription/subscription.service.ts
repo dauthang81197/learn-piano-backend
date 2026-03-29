@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -42,10 +38,9 @@ export class SubscriptionService {
     private config: ConfigService,
     @InjectRepository(User) private usersRepo: Repository<User>,
   ) {
-    this.stripe = new Stripe(
-      this.config.get<string>('STRIPE_SECRET_KEY', 'sk_test_placeholder'),
-      { apiVersion: '2026-03-25.dahlia' },
-    );
+    this.stripe = new Stripe(this.config.get<string>('STRIPE_SECRET_KEY', 'sk_test_placeholder'), {
+      apiVersion: '2026-03-25.dahlia',
+    });
   }
 
   getPlans() {
@@ -95,15 +90,14 @@ export class SubscriptionService {
         message: 'Subscription upgraded to premium successfully',
         subscription: SubscriptionType.PREMIUM,
       };
-    } catch (err) {
-      this.logger.error('Stripe error:', err.message);
-      throw new BadRequestException(`Payment failed: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.error('Stripe error:', message);
+      throw new BadRequestException(`Payment failed: ${message}`);
     }
   }
 
-  async cancelSubscription(
-    user: User,
-  ): Promise<{ message: string }> {
+  async cancelSubscription(user: User): Promise<{ message: string }> {
     if (!user.stripeSubscriptionId) {
       throw new BadRequestException('No active subscription found');
     }
@@ -113,8 +107,9 @@ export class SubscriptionService {
       user.stripeSubscriptionId = null;
       await this.usersRepo.save(user);
       return { message: 'Subscription cancelled successfully' };
-    } catch (err) {
-      throw new BadRequestException(`Cancellation failed: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new BadRequestException(`Cancellation failed: ${message}`);
     }
   }
 }

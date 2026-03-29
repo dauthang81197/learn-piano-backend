@@ -53,4 +53,3 @@ export class CreateQuizDto {
   @IsOptional()
   xpReward?: number;
 }
-

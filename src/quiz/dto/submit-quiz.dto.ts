@@ -17,4 +17,3 @@ export class SubmitQuizDto {
   @Type(() => AnswerDto)
   answers: AnswerDto[];
 }
-

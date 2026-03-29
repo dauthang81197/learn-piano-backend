@@ -35,17 +35,9 @@ export class ProgressController {
   @ApiOperation({ summary: 'Đánh dấu bài học đã hoàn thành và nhận XP' })
   @ApiParam({ name: 'lessonId', description: 'ID bài học' })
   @ApiResponse({ status: 201, description: 'Hoàn thành bài học thành công' })
-  async completeLesson(
-    @Param('lessonId') lessonId: string,
-    @CurrentUser() user: User,
-  ) {
+  async completeLesson(@Param('lessonId') lessonId: string, @CurrentUser() user: User) {
     const lesson = await this.lessonsService.findOne(lessonId, user);
-    const updated = await this.progressService.completeLesson(
-      user,
-      lessonId,
-      lesson.xpReward,
-    );
+    const updated = await this.progressService.completeLesson(user, lessonId, lesson.xpReward);
     return this.progressService.getProgress(updated);
   }
 }
-
