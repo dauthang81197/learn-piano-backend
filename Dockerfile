@@ -4,7 +4,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install dependencies (including devDependencies needed to build)
-COPY package*.json ./
+COPY .npmrc package*.json ./
 RUN npm ci
 
 # Copy source and compile TypeScript
