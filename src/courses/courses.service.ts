@@ -77,5 +77,24 @@ export class CoursesService {
     await this.coursesRepo.remove(course);
     return { message: 'Khóa học đã được xóa' };
   }
-}
 
+  async assignLesson(courseId: string, lessonId: string) {
+    await this.findOne(courseId);
+
+    const lesson = await this.lessonsRepo.findOne({ where: { id: lessonId } });
+    if (!lesson) throw new NotFoundException('Bài học không tồn tại');
+
+    lesson.courseId = courseId;
+    await this.lessonsRepo.save(lesson);
+    return { message: 'Gắn bài học vào khóa học thành công' };
+  }
+
+  async removeLesson(courseId: string, lessonId: string) {
+    const lesson = await this.lessonsRepo.findOne({ where: { id: lessonId, courseId } });
+    if (!lesson) throw new NotFoundException('Bài học không thuộc khóa học này');
+
+    lesson.courseId = null;
+    await this.lessonsRepo.save(lesson);
+    return { message: 'Gỡ bài học khỏi khóa học thành công' };
+  }
+}

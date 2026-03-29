@@ -45,4 +45,9 @@ export class CreateLessonDto {
   @IsBoolean()
   @IsOptional()
   isPremium?: boolean;
+
+  @ApiPropertyOptional({ example: 'uuid-of-course', description: 'ID khóa học chứa bài này' })
+  @IsString()
+  @IsOptional()
+  courseId?: string;
 }
