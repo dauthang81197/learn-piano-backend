@@ -69,5 +69,28 @@ export class CoursesController {
   remove(@Param('id') id: string) {
     return this.coursesService.remove(id);
   }
-}
 
+  @Post(':courseId/lessons/:lessonId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Gắn bài học vào khóa học (Admin only)' })
+  @ApiParam({ name: 'courseId', description: 'ID khóa học' })
+  @ApiParam({ name: 'lessonId', description: 'ID bài học' })
+  @ApiResponse({ status: 201, description: 'Gắn thành công' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy khóa học hoặc bài học' })
+  assignLesson(@Param('courseId') courseId: string, @Param('lessonId') lessonId: string) {
+    return this.coursesService.assignLesson(courseId, lessonId);
+  }
+
+  @Delete(':courseId/lessons/:lessonId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Gỡ bài học khỏi khóa học (Admin only)' })
+  @ApiParam({ name: 'courseId', description: 'ID khóa học' })
+  @ApiParam({ name: 'lessonId', description: 'ID bài học' })
+  @ApiResponse({ status: 200, description: 'Gỡ thành công' })
+  @ApiResponse({ status: 404, description: 'Bài học không thuộc khóa học này' })
+  removeLesson(@Param('courseId') courseId: string, @Param('lessonId') lessonId: string) {
+    return this.coursesService.removeLesson(courseId, lessonId);
+  }
+}
