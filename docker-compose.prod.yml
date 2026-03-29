@@ -1,0 +1,14 @@
+version: '3.8'
+
+# Database va Redis da chay san ben ngoai (external) tren VPS.
+# File nay chi quan ly backend app container.
+
+services:
+  backend:
+    image: learn-piano-backend:latest
+    container_name: learn_piano_backend
+    restart: unless-stopped
+    ports:
+      - '${PORT:-8000}:8000'
+    env_file:
+      - .env
