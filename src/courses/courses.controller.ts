@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { CoursesService } from './courses.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -8,6 +8,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UserRole, User } from '../users/user.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { PaginateQueryDto } from './dto/paginate-query.dto';
 
 @ApiTags('courses')
 @ApiBearerAuth('access-token')
@@ -17,10 +18,10 @@ export class CoursesController {
   constructor(private coursesService: CoursesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Lấy danh sách khóa học piano' })
-  @ApiResponse({ status: 200, description: 'Danh sách khóa học' })
-  findAll() {
-    return this.coursesService.findAll();
+  @ApiOperation({ summary: 'Lấy danh sách khóa học piano (có phân trang)' })
+  @ApiResponse({ status: 200, description: 'Danh sách khóa học phân trang' })
+  findAll(@Query() query: PaginateQueryDto) {
+    return this.coursesService.findAll(query.page, query.limit);
   }
 
   @Get(':id/roadmap')
