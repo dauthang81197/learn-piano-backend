@@ -85,6 +85,12 @@ export class User {
   @OneToMany(() => SubscriptionEvent, (ev) => ev.user)
   subscriptionEvents: SubscriptionEvent[];
 
+  /**
+   * Populated at runtime by JwtStrategy on every authenticated request.
+   * NOT a DB column — TypeORM ignores fields without a column decorator.
+   */
+  activeSubscription?: UserSubscription | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
