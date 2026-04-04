@@ -14,6 +14,7 @@ import {
 import { PaymentMethod, PaymentMethodType } from './entities/payment-method.entity';
 import { SubscriptionEvent, SubscriptionEventType } from './entities/subscription-event.entity';
 import { UpgradeSubscriptionDto } from './dto/upgrade-subscription.dto';
+import { SelectPlanDto } from './dto/select-plan.dto';
 
 @Injectable()
 export class SubscriptionService {
@@ -252,6 +253,134 @@ export class SubscriptionService {
     });
 
     return { message: `Plan changed to ${newPlan.name}` };
+  }
+
+  // ── Select Plan (first-time) ──────────────────────────────────────────────
+
+  async selectPlan(
+    user: User,
+    dto: SelectPlanDto,
+  ): Promise<{
+    message: string;
+    status: string;
+    trialEndDate: Date;
+    trialDaysLeft: number;
+  }> {
+    // Kiểm tra user đã có subscription chưa
+    const existing = await this.subscriptionsRepo.findOne({
+      where: [
+        { userId: user.id, status: SubscriptionStatus.ACTIVE },
+        { userId: user.id, status: SubscriptionStatus.TRIALING },
+        { userId: user.id, status: SubscriptionStatus.PAST_DUE },
+      ],
+    });
+    if (existing) {
+      throw new BadRequestException('Bạn đã có subscription đang hoạt động.');
+    }
+
+    // Premium plan → yêu cầu thanh toán
+    if (dto.planSlug !== 'free') {
+      throw new BadRequestException(
+        'Gói premium yêu cầu thanh toán. Vui lòng dùng POST /subscription/upgrade.',
+      );
+    }
+
+    const plan = await this.plansRepo.findOne({
+      where: { slug: 'free', isActive: true },
+    });
+    if (!plan) throw new NotFoundException('Không tìm thấy gói free.');
+
+    const now = new Date();
+    // Lấy trialDays từ DB (đã set = 7), fallback về 7 nếu DB = 0
+    const trialDays = plan.trialDays > 0 ? plan.trialDays : 7;
+    const trialEndDate = new Date(now.getTime() + trialDays * 86_400_000);
+
+    const subscription = this.subscriptionsRepo.create({
+      userId: user.id,
+      planId: plan.id,
+      status: SubscriptionStatus.TRIALING,
+      startDate: now,
+      trialEndDate,
+      nextBillingDate: null,
+      cancelAtPeriodEnd: false,
+      stripeSubscriptionId: null,
+      paymentMethodId: null,
+    });
+    await this.subscriptionsRepo.save(subscription);
+
+    await this.logEvent(user.id, subscription.id, SubscriptionEventType.TRIAL_STARTED, {
+      planSlug: plan.slug,
+      trialDays,
+      trialEndDate: trialEndDate.toISOString(),
+    });
+
+    const trialDaysLeft = Math.ceil((trialEndDate.getTime() - Date.now()) / 86_400_000);
+
+    return {
+      message: `Dùng thử miễn phí ${trialDays} ngày đã được kích hoạt!`,
+      status: SubscriptionStatus.TRIALING,
+      trialEndDate,
+      trialDaysLeft,
+    };
+  }
+
+  // ── Get My Subscription ────────────────────────────────────────────────────
+
+  async getMySubscription(userId: string) {
+    const sub = await this.subscriptionsRepo.findOne({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+      relations: ['plan'],
+    });
+
+    if (!sub) {
+      return {
+        hasSubscription: false,
+        needsPlanSelection: true,
+        message: 'Vui lòng chọn gói subscription để bắt đầu.',
+      };
+    }
+
+    const now = new Date();
+
+    // Auto-expire: trial đã hết nhưng DB vẫn còn 'trialing'
+    if (sub.status === SubscriptionStatus.TRIALING && sub.trialEndDate && sub.trialEndDate < now) {
+      sub.status = SubscriptionStatus.EXPIRED;
+      await this.subscriptionsRepo.save(sub);
+
+      await this.logEvent(sub.userId, sub.id, SubscriptionEventType.TRIAL_ENDED, {
+        expiredAt: now.toISOString(),
+      });
+
+      return {
+        hasSubscription: true,
+        needsPlanSelection: false,
+        status: SubscriptionStatus.EXPIRED,
+        planName: sub.plan.name,
+        planSlug: sub.plan.slug,
+        trialDaysLeft: 0,
+        trialEndDate: sub.trialEndDate,
+        message:
+          'Thời gian dùng thử 7 ngày đã kết thúc. Vui lòng nâng cấp lên Premium để tiếp tục.',
+      };
+    }
+
+    const trialDaysLeft = sub.trialEndDate
+      ? Math.max(0, Math.ceil((sub.trialEndDate.getTime() - now.getTime()) / 86_400_000))
+      : null;
+
+    return {
+      hasSubscription: true,
+      needsPlanSelection: false,
+      status: sub.status,
+      planName: sub.plan.name,
+      planSlug: sub.plan.slug,
+      trialEndDate: sub.trialEndDate ?? null,
+      trialDaysLeft,
+      nextBillingDate: sub.nextBillingDate ?? null,
+      cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
+      startDate: sub.startDate,
+    };
   }
 
   // ── Helper ─────────────────────────────────────────────────────────────────
