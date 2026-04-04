@@ -4,7 +4,12 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { UserSubscription } from '../subscription/entities/user-subscription.entity';
+import { PaymentMethod } from '../subscription/entities/payment-method.entity';
+import { SubscriptionInvoice } from '../subscription/entities/subscription-invoice.entity';
+import { SubscriptionEvent } from '../subscription/entities/subscription-event.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -58,11 +63,27 @@ export class User {
   @Column({ type: 'simple-array', default: '' })
   completedLessons: string[];
 
+  /** Stripe Customer ID — stays at user level (one customer per user) */
   @Column({ nullable: true, type: 'varchar' })
   stripeCustomerId: string | null;
 
-  @Column({ nullable: true, type: 'varchar' })
-  stripeSubscriptionId: string | null;
+  // ── Relationships ────────────────────────────────────────────────────────
+
+  /** All subscriptions belonging to this user (active + history) */
+  @OneToMany(() => UserSubscription, (sub) => sub.user)
+  subscriptions: UserSubscription[];
+
+  /** Saved payment methods */
+  @OneToMany(() => PaymentMethod, (pm) => pm.user)
+  paymentMethods: PaymentMethod[];
+
+  /** All billing invoices */
+  @OneToMany(() => SubscriptionInvoice, (inv) => inv.user)
+  invoices: SubscriptionInvoice[];
+
+  /** Audit log of subscription lifecycle events */
+  @OneToMany(() => SubscriptionEvent, (ev) => ev.user)
+  subscriptionEvents: SubscriptionEvent[];
 
   @CreateDateColumn()
   createdAt: Date;

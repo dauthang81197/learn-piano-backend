@@ -14,6 +14,11 @@ import { User } from './users/user.entity';
 import { Lesson } from './lessons/lesson.entity';
 import { Quiz } from './quiz/quiz.entity';
 import { Course } from './courses/course.entity';
+import { SubscriptionPlan } from './subscription/entities/subscription-plan.entity';
+import { UserSubscription } from './subscription/entities/user-subscription.entity';
+import { SubscriptionInvoice } from './subscription/entities/subscription-invoice.entity';
+import { PaymentMethod } from './subscription/entities/payment-method.entity';
+import { SubscriptionEvent } from './subscription/entities/subscription-event.entity';
 
 @Module({
   imports: [
@@ -28,7 +33,17 @@ import { Course } from './courses/course.entity';
         username: config.get<string>('DB_USERNAME', 'postgres'),
         password: config.get<string>('DB_PASSWORD', 'postgres'),
         database: config.get<string>('DB_DATABASE', 'learn_piano'),
-        entities: [User, Lesson, Quiz, Course],
+        entities: [
+          User,
+          Lesson,
+          Quiz,
+          Course,
+          SubscriptionPlan,
+          UserSubscription,
+          SubscriptionInvoice,
+          PaymentMethod,
+          SubscriptionEvent,
+        ],
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_history',
         synchronize: false, // ← tắt hoàn toàn, dùng migration thay thế
