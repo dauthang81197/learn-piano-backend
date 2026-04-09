@@ -8,6 +8,7 @@ import { UserSubscription } from '../subscription/entities/user-subscription.ent
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
+
 export interface AuthResponse {
   accessToken: string;
   /** true = user chưa chọn gói nào → frontend hiện modal chọn gói */
@@ -16,6 +17,12 @@ export interface AuthResponse {
   subscriptionStatus: string | null;
   /** Số ngày dùng thử còn lại; null nếu không trong trial */
   trialDaysLeft: number | null;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
 
 @Injectable()
@@ -25,7 +32,7 @@ export class AuthService {
     @InjectRepository(UserSubscription)
     private subscriptionsRepo: Repository<UserSubscription>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
     const existing = await this.usersRepo.findOne({
@@ -77,8 +84,14 @@ export class AuthService {
     };
   }
 
-  private signToken(user: User): { accessToken: string } {
+  private signToken(user: User): AuthResponse {
     const payload = { sub: user.id, email: user.email, role: user.role };
-    return { accessToken: this.jwtService.sign(payload) };
+    return {
+      accessToken: this.jwtService.sign(payload),
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      needsPlanSelection: false,
+      subscriptionStatus: null,
+      trialDaysLeft: null,
+    };
   }
 }
