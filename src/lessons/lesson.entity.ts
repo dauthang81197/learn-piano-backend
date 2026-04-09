@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { LessonContent } from './lesson-content.entity';
 
 export enum LessonType {
   THEORY = 'theory',
@@ -19,8 +21,11 @@ export class Lesson {
   @Column()
   title: string;
 
-  @Column({ type: 'text' })
-  content: string;
+  @OneToMany(() => LessonContent, (content) => content.lesson, { cascade: true })
+  contents: LessonContent[];
+
+  @Column({ type: 'text', nullable: true })
+  content: string | null;
 
   @Column({ type: 'enum', enum: LessonType, default: LessonType.THEORY })
   type: LessonType;

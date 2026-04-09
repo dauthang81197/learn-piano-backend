@@ -7,9 +7,12 @@ import {
   IsBoolean,
   IsOptional,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LessonType } from '../lesson.entity';
+import { CreateLessonContentDto } from './create-lesson-content.dto';
 
 export class CreateLessonDto {
   @ApiProperty({ example: 'Bài 1: Nốt nhạc cơ bản', description: 'Tiêu đề bài học' })
@@ -17,10 +20,11 @@ export class CreateLessonDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: '<p>Nội dung bài học...</p>', description: 'Nội dung bài học (HTML)' })
-  @IsString()
-  @IsNotEmpty()
-  content: string;
+  @ApiProperty({ type: [CreateLessonContentDto], description: 'Danh sách content blocks theo thứ tự' })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateLessonContentDto)
+  contents: CreateLessonContentDto[];
 
   @ApiProperty({ enum: LessonType, description: 'Loại bài học' })
   @IsEnum(LessonType)

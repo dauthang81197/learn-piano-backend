@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { User } from '../users/user.entity';
 import { Lesson } from '../lessons/lesson.entity';
+import { LessonContent } from '../lessons/lesson-content.entity';
 import { Quiz } from '../quiz/quiz.entity';
 import { Course } from '../courses/course.entity';
 import { SubscriptionPlan } from '../subscription/entities/subscription-plan.entity';
@@ -22,6 +23,7 @@ export const AppDataSource = new DataSource({
   entities: [
     User,
     Lesson,
+    LessonContent,
     Quiz,
     Course,
     SubscriptionPlan,
