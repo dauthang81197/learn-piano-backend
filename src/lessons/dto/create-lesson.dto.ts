@@ -20,7 +20,10 @@ export class CreateLessonDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ type: [CreateLessonContentDto], description: 'Danh sách content blocks theo thứ tự' })
+  @ApiProperty({
+    type: [CreateLessonContentDto],
+    description: 'Danh sách content blocks theo thứ tự',
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateLessonContentDto)

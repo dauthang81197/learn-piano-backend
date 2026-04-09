@@ -8,7 +8,6 @@ import { UserSubscription } from '../subscription/entities/user-subscription.ent
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
-
 export interface AuthResponse {
   accessToken: string;
   /** true = user chưa chọn gói nào → frontend hiện modal chọn gói */
@@ -32,7 +31,7 @@ export class AuthService {
     @InjectRepository(UserSubscription)
     private subscriptionsRepo: Repository<UserSubscription>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
     const existing = await this.usersRepo.findOne({
