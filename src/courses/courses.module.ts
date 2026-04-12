@@ -4,11 +4,12 @@ import { Course } from './course.entity';
 import { Lesson } from '../lessons/lesson.entity';
 import { CoursesService } from './courses.service';
 import { CoursesController } from './courses.controller';
+import { AdminCoursesController } from './admin-courses.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Course, Lesson])],
   providers: [CoursesService],
-  controllers: [CoursesController],
+  controllers: [CoursesController, AdminCoursesController],
   exports: [CoursesService],
 })
 export class CoursesModule {}

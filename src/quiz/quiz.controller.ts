@@ -2,11 +2,8 @@ import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { QuizService } from './quiz.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { UserRole, User } from '../users/user.entity';
-import { CreateQuizDto } from './dto/create-quiz.dto';
+import { User } from '../users/user.entity';
 import { SubmitQuizDto } from './dto/submit-quiz.dto';
 
 @ApiTags('quiz')
@@ -34,15 +31,5 @@ export class QuizController {
     @CurrentUser() user: User,
   ) {
     return this.quizService.submitQuiz(lessonId, dto, user);
-  }
-
-  @Post()
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Tạo câu hỏi quiz mới (Admin only)' })
-  @ApiResponse({ status: 201, description: 'Tạo câu hỏi thành công' })
-  @ApiResponse({ status: 403, description: 'Không có quyền truy cập' })
-  create(@Body() dto: CreateQuizDto) {
-    return this.quizService.create(dto);
   }
 }

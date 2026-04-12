@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Lesson } from './lesson.entity';
 import { LessonContent } from './lesson-content.entity';
-import { User, SubscriptionType } from '../users/user.entity';
+import { User, SubscriptionType, UserRole } from '../users/user.entity';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 
@@ -40,7 +40,11 @@ export class LessonsService {
 
     if (!lesson) throw new NotFoundException('Lesson not found');
 
-    if (lesson.isPremium && user?.subscription !== SubscriptionType.PREMIUM) {
+    if (
+      lesson.isPremium &&
+      user?.subscription !== SubscriptionType.PREMIUM &&
+      user?.role !== UserRole.ADMIN
+    ) {
       throw new ForbiddenException('This lesson requires a premium subscription');
     }
     return lesson;
@@ -64,7 +68,8 @@ export class LessonsService {
   }
 
   async update(id: string, dto: UpdateLessonDto): Promise<Lesson> {
-    const lesson = await this.findOne(id);
+    const lesson = await this.lessonsRepo.findOne({ where: { id } });
+    if (!lesson) throw new NotFoundException('Lesson not found');
     const { contents, ...lessonData } = dto;
     Object.assign(lesson, lessonData);
     await this.lessonsRepo.save(lesson);
@@ -86,7 +91,8 @@ export class LessonsService {
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    const lesson = await this.findOne(id);
+    const lesson = await this.lessonsRepo.findOne({ where: { id } });
+    if (!lesson) throw new NotFoundException('Lesson not found');
     await this.lessonsRepo.remove(lesson);
     return { message: 'Lesson deleted successfully' };
   }
