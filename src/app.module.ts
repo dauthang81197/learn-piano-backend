@@ -10,6 +10,8 @@ import { LessonsModule } from './lessons/lessons.module';
 import { QuizModule } from './quiz/quiz.module';
 import { ProgressModule } from './progress/progress.module';
 import { CoursesModule } from './courses/courses.module';
+import { MediaModule } from './media/media.module';
+import { Media } from './media/media.entity';
 import { User } from './users/user.entity';
 import { Lesson } from './lessons/lesson.entity';
 import { LessonContent } from './lessons/lesson-content.entity';
@@ -45,6 +47,7 @@ import { SubscriptionEvent } from './subscription/entities/subscription-event.en
           SubscriptionInvoice,
           PaymentMethod,
           SubscriptionEvent,
+          Media,
         ],
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_history',
@@ -60,6 +63,7 @@ import { SubscriptionEvent } from './subscription/entities/subscription-event.en
     QuizModule,
     ProgressModule,
     CoursesModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

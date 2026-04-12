@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Lesson } from './lesson.entity';
+import { Media } from '../media/media.entity';
 
 export enum ContentBlockType {
   TEXT = 'text',
@@ -37,9 +38,13 @@ export class LessonContent {
   @Column({ type: 'text', nullable: true })
   textData: string | null;
 
-  // VIDEO hoặc IMAGE
-  @Column({ type: 'varchar', nullable: true })
-  url: string | null;
+  // VIDEO hoặc IMAGE — tham chiếu đến bảng media
+  @Column({ type: 'uuid', nullable: true })
+  mediaId: string | null = null;
+
+  @ManyToOne(() => Media, { nullable: true, onDelete: 'SET NULL', eager: true })
+  @JoinColumn({ name: 'mediaId' })
+  media: Media | null = null;
 
   // VIDEO — thời lượng tính bằng giây
   @Column({ type: 'int', nullable: true })

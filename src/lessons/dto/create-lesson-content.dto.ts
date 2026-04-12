@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ContentBlockType } from '../lesson-content.entity';
 
@@ -21,12 +21,12 @@ export class CreateLessonContentDto {
   textData?: string;
 
   @ApiPropertyOptional({
-    example: 'https://...',
-    description: 'URL video hoặc ảnh (dùng cho type=video/image)',
+    example: 'uuid-của-media',
+    description: 'ID media (dùng cho type=video/image)',
   })
-  @IsString()
+  @IsUUID()
   @IsOptional()
-  url?: string;
+  mediaId?: string;
 
   @ApiPropertyOptional({
     example: 120,
